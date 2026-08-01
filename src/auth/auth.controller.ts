@@ -1,4 +1,4 @@
-import { Public } from '../common/decorators/pubilc.decorator';
+import { Public } from '../common/decorators/public.decorator';
 import { AuthService } from './auth.service';
 import { Controller, Body, Post } from '@nestjs/common';
 import { SignUpReqDTO } from './dto/req/signUp.req.dto';
