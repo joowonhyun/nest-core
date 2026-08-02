@@ -60,3 +60,6 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 # OMC runtime state
 .omc/*
 !.omc/skills/
+
+# Claude Code local settings
+.claude/
