@@ -5,7 +5,6 @@ import { SignUpReqDTO } from './dto/req/signUp.req.dto';
 import { SignInReqDTO } from './dto/req/signIn.req.dto';
 import { TokenResDTO } from './dto/res/token.res.dto';
 import { User } from '../common/decorators/user.decorator';
-import { JwtPayload } from '../common/types/jwtPayload.types';
 import { AuthGuard } from '@nestjs/passport';
 import { RtJwtPayload } from '../common/types/rtJwtPayload.types';
 
@@ -29,8 +28,8 @@ export class AuthController {
 
   // 3- 로그아웃
   @Post('/logout')
-  logout(@User() user: JwtPayload) {
-    return this.authService.logout(user);
+  logout(@User('id') userId: string) {
+    return this.authService.logout(userId);
   }
 
   // 4- 토큰 재발급 API

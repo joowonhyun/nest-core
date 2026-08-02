@@ -11,7 +11,6 @@ import { SignUpReqDTO } from './dto/req/signUp.req.dto';
 import * as bcrypt from 'bcrypt';
 import { SignInReqDTO } from './dto/req/signIn.req.dto';
 import { TokenResDTO } from './dto/res/token.res.dto';
-import { JwtPayload } from '../common/types/jwtPayload.types';
 import { RtJwtPayload } from '../common/types/rtJwtPayload.types';
 
 @Injectable()
@@ -123,10 +122,10 @@ export class AuthService {
     };
   }
 
-  async logout(user: JwtPayload) {
+  async logout(userId: string) {
     await this.prismaService.user.update({
       where: {
-        id: user.id,
+        id: userId,
       },
       data: {
         hashedRt: null,
