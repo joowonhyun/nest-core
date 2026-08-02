@@ -1,8 +1,9 @@
 import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { LoggerMiddleware } from './common/logger.middleware';
-import { APP_GUARD, APP_PIPE } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { AtGuard } from './common/guards/at.guards';
 import { AuthModule } from './auth/auth.module';
+import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
 @Module({
   imports: [AuthModule],
@@ -20,6 +21,10 @@ import { AuthModule } from './auth/auth.module';
           forbidNonWhitelisted: true, // DTO에 없는 필드가 오면 400 에러로 거부
           transform: true, // 쿼리/파라미터 문자열을 DTO에 선언된 타입으로 자동 변환
         }),
+    },
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
     },
   ],
 })
