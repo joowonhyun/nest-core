@@ -30,5 +30,5 @@ model Board {
   title String 
   body String 
   createdAt DateTime @default(now()) @map("created_at") 
-  updateddAt DateTime @default(now()) @map("updated_at") 
+  updatedAt DateTime @default(now()) @map("updated_at") 
 }
