@@ -36,7 +36,7 @@ export class AuthService {
     const hashedPassword = await this.hashData(dto.password);
 
     //유저 생성
-    const newUser = await this.prismaService.user.create({
+    await this.prismaService.user.create({
       data: {
         email: dto.email,
         password: hashedPassword,
@@ -47,8 +47,6 @@ export class AuthService {
         name: true,
       },
     });
-
-    return newUser;
   }
 
   hashData(data: string) {
