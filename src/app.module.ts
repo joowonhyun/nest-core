@@ -4,9 +4,10 @@ import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { AtGuard } from './common/guards/at.guards';
 import { AuthModule } from './auth/auth.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { BoardModule } from './board/board.module';
 
 @Module({
-  imports: [AuthModule],
+  imports: [AuthModule, BoardModule],
   controllers: [],
   providers: [
     {
