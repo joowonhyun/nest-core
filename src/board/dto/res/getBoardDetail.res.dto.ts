@@ -1,12 +1,14 @@
+import { Expose, Type } from 'class-transformer';
+
 export class User {
-  name: string;
+  @Expose() name: string;
 }
 
 export class GetBoardDetailResDTO {
-  id: string;
-  title: string;
-  body: string;
-  user: User;
-  createdAt: Date;
-  updatedAt: Date;
+  @Expose() id: string;
+  @Expose() title: string;
+  @Expose() body: string;
+  @Expose() @Type(() => User) user: User;
+  @Expose() createdAt: Date;
+  @Expose() updatedAt: Date;
 }

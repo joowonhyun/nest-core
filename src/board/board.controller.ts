@@ -1,6 +1,15 @@
 import { Public } from '../common/decorators/public.decorator';
 import { BoardService } from './board.service';
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { GetAllBoardsResDTO } from './dto/res/getAllBoards.res.dto';
 import { GetBoardDetailResDTO } from './dto/res/getBoardDetail.res.dto';
 import { JwtPayload } from '../common/types/jwtPayload.types';
@@ -86,5 +95,29 @@ export class BoardController {
     @Body() dto: UpdateBoardReqDTO,
   ): Promise<UpdateBoardResDTO> {
     return this.boardService.updateBoard(boardId, user, dto);
+  }
+
+  // 게시판 삭제
+  @ApiOperation({ summary: '게시판 삭제' })
+  @ApiResponse({
+    status: 200,
+    description: '삭제 성공',
+  })
+  @ApiResponse({
+    status: 403,
+    description: '해당 게시글의 삭제 권한이 없는 경우',
+  })
+  @ApiResponse({
+    status: 404,
+    description: '해당 ID의 게시글이 존재하지 않는 경우',
+  })
+  @ApiBearerAuth('accessToken')
+  @HttpCode(200)
+  @Delete('/:boardId')
+  deleteBoard(
+    @Param('boardId') boardId: string,
+    @User() user: JwtPayload,
+  ): Promise<void> {
+    return this.boardService.deleteBoard(boardId, user);
   }
 }

@@ -1,8 +1,10 @@
+import { Expose } from 'class-transformer';
+
 export class UpdateBoardResDTO {
-  id: string;
-  title: string;
-  body: string;
-  userId: string;
-  createdAt: Date;
-  updatedAt: Date;
+  @Expose() id: string;
+  @Expose() title: string;
+  @Expose() body: string;
+  @Expose() userId: string;
+  @Expose() createdAt: Date;
+  @Expose() updatedAt: Date;
 }

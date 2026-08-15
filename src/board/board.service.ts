@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { plainToInstance } from 'class-transformer';
 import { PrismaService } from '../prisma.service';
 import { GetAllBoardsResDTO } from './dto/res/getAllBoards.res.dto';
 import { GetBoardDetailResDTO } from './dto/res/getBoardDetail.res.dto';
@@ -31,7 +32,9 @@ export class BoardService {
       },
     });
 
-    return boards;
+    return plainToInstance(GetAllBoardsResDTO, boards, {
+      excludeExtraneousValues: true,
+    });
   }
 
   async getBoardDetail(boardId: string): Promise<GetBoardDetailResDTO> {
@@ -55,7 +58,10 @@ export class BoardService {
 
     if (!board)
       throw new NotFoundException('해당 ID의 게시글이 존재하지 않습니다.');
-    return board;
+
+    return plainToInstance(GetBoardDetailResDTO, board, {
+      excludeExtraneousValues: true,
+    });
   }
 
   async createBoard(
@@ -69,7 +75,10 @@ export class BoardService {
         userId: user.id,
       },
     });
-    return board;
+
+    return plainToInstance(CreateBoardResDTO, board, {
+      excludeExtraneousValues: true,
+    });
   }
 
   async updateBoard(
@@ -77,19 +86,7 @@ export class BoardService {
     user: JwtPayload,
     dto: UpdateBoardReqDTO,
   ): Promise<UpdateBoardResDTO> {
-    const findBoard = await this.prismaService.board.findUnique({
-      where: {
-        id: boardId,
-      },
-    });
-
-    if (!findBoard) {
-      throw new NotFoundException('해당 ID의 게시글이 존재하지 않습니다.');
-    }
-
-    if (findBoard.userId !== user.id) {
-      throw new ForbiddenException('해당 게시글의 수정 권한이 없습니다.');
-    }
+    await this.findBoardOwnedByUser(boardId, user.id);
 
     const board = await this.prismaService.board.update({
       where: {
@@ -100,6 +97,36 @@ export class BoardService {
         body: dto.body,
       },
     });
+
+    return plainToInstance(UpdateBoardResDTO, board, {
+      excludeExtraneousValues: true,
+    });
+  }
+
+  async deleteBoard(boardId: string, user: JwtPayload): Promise<void> {
+    await this.findBoardOwnedByUser(boardId, user.id);
+
+    await this.prismaService.board.delete({
+      where: {
+        id: boardId,
+      },
+    });
+  }
+
+  private async findBoardOwnedByUser(boardId: string, userId: string) {
+    const board = await this.prismaService.board.findUnique({
+      where: {
+        id: boardId,
+      },
+    });
+
+    if (!board) {
+      throw new NotFoundException('해당 ID의 게시글이 존재하지 않습니다.');
+    }
+
+    if (board.userId !== userId) {
+      throw new ForbiddenException('해당 게시글에 대한 권한이 없습니다.');
+    }
 
     return board;
   }
