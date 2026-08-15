@@ -1,98 +1,78 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# nest-core
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+NestJS로 JWT 인증(Access/Refresh 토큰)과 게시판 CRUD를 구현해보는 학습용 프로젝트입니다.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 기술 스택
 
-## Description
+- **Framework**: NestJS 11
+- **DB / ORM**: MariaDB + Prisma
+- **인증**: `passport-jwt` (Access Token / Refresh Token 이중 발급, RT는 해싱 후 DB 저장)
+- **검증**: `class-validator`, `class-transformer`
+- **문서화**: Swagger (`@nestjs/swagger`)
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Project setup
+## 프로젝트 설정
 
 ```bash
-$ pnpm install
+pnpm install
 ```
 
-## Compile and run the project
+`.env` 파일을 프로젝트 루트에 생성하고 아래 값을 채워주세요.
 
 ```bash
-# development
-$ pnpm run start
+# MariaDB/MySQL 연결 문자열
+# 형식: mysql://USER:PASSWORD@HOST:PORT/DATABASE_NAME
+DATABASE_URL=
 
-# watch mode
-$ pnpm run start:dev
+# 미설정 시 3000번 포트 사용
+PORT=3000
 
-# production mode
-$ pnpm run start:prod
+# JWT 서명 secret (Access Token / Refresh Token 각각 별도 secret 사용)
+AT_SECRET=
+RT_SECRET=
 ```
 
-## Run tests
+DB 스키마 반영 및 Prisma Client 생성:
 
 ```bash
-# unit tests
-$ pnpm run test
-
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
+npx prisma migrate dev
+npx prisma generate
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## 실행
 
 ```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
+# 개발 모드
+pnpm run start:dev
+
+# 프로덕션 모드
+pnpm run start:prod
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+서버 실행 후 Swagger 문서는 `http://localhost:3000/api-docs`에서 확인할 수 있습니다.
 
-## Resources
+## API
 
-Check out a few resources that may come in handy when working with NestJS:
+### Auth (`/auth`)
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+| Method | Endpoint | 인증 | 설명 |
+|---|---|---|---|
+| POST | `/auth/signup` | - | 이메일/비밀번호로 회원가입 |
+| POST | `/auth/signin` | - | 로그인, Access/Refresh 토큰 발급 |
+| POST | `/auth/logout` | Access Token | 로그아웃 (저장된 Refresh Token 무효화) |
+| POST | `/auth/refresh` | Refresh Token | Access Token 재발급 (Refresh Token도 회전) |
 
-## Support
+### Board (`/board`)
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+| Method | Endpoint | 인증 | 설명 |
+|---|---|---|---|
+| GET | `/board/all` | - | 게시글 목록 조회 |
+| GET | `/board/:boardId` | - | 게시글 상세 조회 |
+| POST | `/board` | Access Token | 게시글 생성 |
+| PATCH | `/board/:boardId` | Access Token (작성자 본인) | 게시글 수정 |
+| DELETE | `/board/:boardId` | Access Token (작성자 본인) | 게시글 삭제 |
 
-## Stay in touch
+## 인증 방식 메모
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+- 라우트는 기본적으로 전역 `AtGuard`에 의해 인증이 필요하며, `@Public()` 데코레이터가 붙은 핸들러만 예외입니다.
+- Refresh Token은 클라이언트에는 원문으로 발급하지만, DB에는 bcrypt로 해싱한 값만 저장합니다.
+- `/auth/refresh`는 `@Public()`이 붙어있지만 동시에 별도의 `jwt-refresh` 전략(Guard)이 걸려있어, "Access Token은 필요 없지만 Refresh Token 인증 자체는 필요하다"는 의미입니다.
