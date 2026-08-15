@@ -74,7 +74,6 @@ export class AuthService {
     }
     // 토큰 발급
     const tokens = await this.getUserTokens(user.id, user.email, user.name);
-    //RT 해쉬 업데이트 (hashedRt 저장) 구현 필요
     const hashedRt = await this.hashData(tokens.refreshToken);
 
     await this.prismaService.user.update({
